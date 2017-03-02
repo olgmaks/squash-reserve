@@ -1,16 +1,5 @@
-// Connection URL
-var url = 'mongodb://localhost:27017/SquashOrderRegistrationSystemDB';
-
 // getting-started.js
 var mongoose = require('mongoose');
-mongoose.connect(url);
- 
-// Open connection
-var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function () {
-    console.log("Connected successful");
-});
 
 // Create schema
 var Schema = mongoose.Schema;
@@ -20,14 +9,14 @@ var Schema = mongoose.Schema;
  * User Schema
  */
 var UserSchema = new Schema({
-  firstName: String,
-  lastName: String,
-  phone: String,
-  email: String,
-  status: String,
-  lastVisit: { type: Date, default: Date.now },
-  created: { type: Date, default: Date.now },
-  updated: { type: Date, default: Date.now }
+    firstName: String,
+    lastName: String,
+    phone: String,
+    email: String,
+    status: String,
+    lastVisit: {type: Date, default: Date.now},
+    created: {type: Date, default: Date.now},
+    updated: {type: Date, default: Date.now}
 });
 
 /**
@@ -40,45 +29,56 @@ var UserSchema = new Schema({
 /**
  * Methods
  */
-UserSchema.method({
-});
+UserSchema.method({});
 
 /**
  * Statics
  */
 UserSchema.statics = {
-  /**
-   * Get user
-   * @param {ObjectId} id - The objectId of user.
-   * @returns {Promise<User, APIError>}
-   */
-  get(id) {
-    return this.findById(id)
-      .exec()
-      .then((user) => {
-        if (user) {
-          return user;
-        }
-        const err = new APIError('No such user exists!', httpStatus.NOT_FOUND);
-        return Promise.reject(err);
-      });
-  },
+    /**
+     * Get user
+     * @param {ObjectId} id - The objectId of user.
+     * @returns {Promise<User, APIError>}
+     */
+    get(id) {
+        return this.findById(id)
+            .exec()
+            .then((user) => {
+                if (user) {
+                    return user;
+                }
+                const err = new APIError('No such user exists!', httpStatus.NOT_FOUND);
+                return Promise.reject(err);
+            });
+    },
 
-  /**
-   * List users in descending order of 'createdAt' timestamp.
-   * @param {number} skip - Number of users to be skipped.
-   * @param {number} limit - Limit number of users to be returned.
-   * @returns {Promise<User[]>}
-   */
-  list() {
-    return this.find() 
-      .exec();
-  }
+    getByEmail(email) {
+        return this.findOne({email:email})
+            .exec()
+            .then((user) => {
+                if (user) {
+                    return user;
+                }
+                const err = new Error('No such user exists!', '404');
+                return Promise.reject(err);
+            });
+    },
+
+    /**
+     * List users in descending order of 'createdAt' timestamp.
+     * @param {number} skip - Number of users to be skipped.
+     * @param {number} limit - Limit number of users to be returned.
+     * @returns {Promise<User[]>}
+     */
+    list() {
+        return this.find()
+            .exec();
+    }
 };
 
 /**
  * @typedef User
  */
 module.exports = {
-  UserModel: mongoose.model('UserModel', UserSchema)
+    UserModel: mongoose.model('User', UserSchema)
 }
