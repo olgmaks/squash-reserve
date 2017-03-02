@@ -12,12 +12,12 @@ db.once('open', function () {
 
 // MongoDB model
 let UserModel = require('./src/model/user.model').UserModel;
-
+let OrderModel = require('./src/model/order.model').OrderModel;
 
 // Express server configuration
 let app = express();
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/users', (req, res, next) => {
     UserModel.list()
@@ -39,6 +39,30 @@ app.post('/users', (req, res) => {
     });
 });
 
-app.listen(3000, function () {
-    console.log('Приклад застосунку, який прослуховує 3000-ий порт!');
-});
+app.post('/orders', (req, res) => {
+
+    var userId = req.body.userId;
+    var orderBodyJson = req.body;
+
+    UserModel.findById(userId).exec().then((user) => {
+        orderBodyJson.user = user;
+        new OrderModel(orderBodyJson).save((err, order) => {
+            if (err) {
+                res.json(err);
+            } else {
+                res.json(order);
+            }
+        });
+    });
+
+    app.get('/orders', (req, res) => {
+        OrderModel.list()
+            .then(orders => {
+                res.json(orders);
+            })
+            .catch(e => next(e));
+    });
+
+    app.listen(3000, function () {
+        console.log('Приклад застосунку, який прослуховує 3000-ий порт!');
+    });

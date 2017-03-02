@@ -14,9 +14,9 @@ var UserSchema = new Schema({
     phone: String,
     email: String,
     status: String,
-    lastVisit: {type: Date, default: Date.now},
-    created: {type: Date, default: Date.now},
-    updated: {type: Date, default: Date.now}
+    lastVisit: { type: Date, default: Date.now },
+    created: { type: Date, default: Date.now },
+    updated: { type: Date, default: Date.now }
 });
 
 /**
@@ -53,7 +53,7 @@ UserSchema.statics = {
     },
 
     getByEmail(email) {
-        return this.findOne({email:email})
+        return this.findOne({ email: email })
             .exec()
             .then((user) => {
                 if (user) {
@@ -77,7 +77,7 @@ UserSchema.statics = {
 };
 
 /**
- * @typedef User
+ * @typedef UserModel
  */
 module.exports = {
     UserModel: mongoose.model('User', UserSchema)
