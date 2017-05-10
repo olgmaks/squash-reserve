@@ -1,6 +1,12 @@
 let mongoose = require('mongoose');
 let express = require('express');
 let bodyParser = require('body-parser');
+var oauthServer = require('oauth2-server');
+var Request = express.Request;
+var Response = express.Response;
+var authenticate = require('./src/oauth/authentificate');
+var oauth = require('./src/oauth/oauth');
+
 
 // Open connection
 mongoose.connect('mongodb://localhost:27017/SquashOrderRegistrationSystemDB');
@@ -19,7 +25,20 @@ let app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get('/users', (req, res, next) => {
+// Public area
+require('./src/oauth/express-oauth')(app)
+
+
+app.get('/me', authenticate(), function(req,res){
+  res.json({
+    me: req.user,
+    messsage: 'Authorization success, Without Scopes, Try accessing /profile with `profile` scope',
+    description: 'Try postman https://www.getpostman.com/collections/37afd82600127fbeef28',
+    more: 'pass `profile` scope while Authorize'
+  })
+});
+
+app.get('/users', authenticate(), (req, res, next) => {
     UserModel.list()
         .then(users => {
             res.json(users);
@@ -53,16 +72,17 @@ app.post('/orders', (req, res) => {
                 res.json(order);
             }
         });
-    });
+    })
+});
 
-    app.get('/orders', (req, res) => {
-        OrderModel.list()
-            .then(orders => {
-                res.json(orders);
-            })
-            .catch(e => next(e));
-    });
+app.get('/orders', (req, res) => {
+    OrderModel.list()
+        .then(orders => {
+            res.json(orders);
+        })
+        .catch(e => next(e));
+});
 
-    app.listen(3000, function () {
-        console.log('Приклад застосунку, який прослуховує 3000-ий порт!');
-    });
+app.listen(3000, function () {
+    console.log('Приклад застосунку, який прослуховує 3000-ий порт!');
+});

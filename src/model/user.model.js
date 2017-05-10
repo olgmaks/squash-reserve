@@ -14,6 +14,9 @@ var UserSchema = new Schema({
     phone: String,
     email: String,
     status: String,
+    username:  String,
+    password:  String,
+    scope: String,
     lastVisit: { type: Date, default: Date.now },
     created: { type: Date, default: Date.now },
     updated: { type: Date, default: Date.now }
@@ -35,6 +38,9 @@ UserSchema.method({});
  * Statics
  */
 UserSchema.statics = {
+
+    findOrCreate() { },
+
     /**
      * Get user
      * @param {ObjectId} id - The objectId of user.
